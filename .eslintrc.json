@@ -1,0 +1,35 @@
+{
+  "env": {
+    "browser": true,
+    "es6": true
+  },
+  "extends": ["airbnb", "prettier", "prettier/react"],
+  "globals": {
+    "window": true,
+    "document": true,
+    "FormData": true,
+    "FileReader": true,
+    "Blob": true,
+    "navigator": true,
+    "eval": true
+  },
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 2018,
+    "sourceType": "module"
+  },
+  "plugins": ["prettier", "import", "react"],
+  "rules": {
+    "import/no-unresolved": [0],
+    "import/prefer-default-export": [0],
+    "no-eval": [0],
+    "no-nested-ternary": [0],
+    "react/jsx-props-no-spreading": [0],
+    "react/forbid-prop-types": [0],
+    "react/react-in-jsx-scope": [0],
+    "prefer-promise-reject-errors": [0]
+  },
+  "parser": "babel-eslint"
+}
