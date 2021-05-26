@@ -1,8 +1,13 @@
 import React from 'react';
 import { Canvas } from '@react-three/fiber';
+import { useVisualization } from '@providers/visualization';
 import Box from './box';
 
 const Home = () => {
+  const { dataset, classes, samplesPerClass } = useVisualization();
+
+  // TODO: Use provider values to manipulate visualizaiton
+
   return (
     <Canvas>
       <ambientLight />
