@@ -4,7 +4,10 @@ import { useVisualization } from '@providers/visualization';
 import Box from './box';
 
 const Home = () => {
-  const { dataset, classes, samplesPerClass } = useVisualization();
+  const {
+    classes,
+    // Extract more data from here
+  } = useVisualization();
 
   // TODO: Use provider values to manipulate visualizaiton
 
@@ -12,8 +15,9 @@ const Home = () => {
     <Canvas>
       <ambientLight />
       <pointLight position={[10, 10, 10]} />
-      <Box position={[-1.2, 0, 0]} />
-      <Box position={[1.2, 0, 0]} />
+      {new Array(classes).fill().map((_, index) => (
+        <Box key={index} position={[index - 3 + index * 0.2, 0, 0]} />
+      ))}
     </Canvas>
   );
 };

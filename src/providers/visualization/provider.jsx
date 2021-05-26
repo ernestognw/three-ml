@@ -5,7 +5,7 @@ const VisualizationContext = createContext({});
 
 const VisualizationProvider = ({ children }) => {
   const [dataset, setDataset] = useState('A');
-  const [classes, setClasses] = useState(0);
+  const [classes, setClasses] = useState(2);
   const [samplesPerClass, setSamplesPerClass] = useState(0);
   const [layers, setLayers] = useState(0);
   const [neuronsPerLayer, setNeuronsPerLayer] = useState(0);
