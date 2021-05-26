@@ -9,6 +9,9 @@ const VisualizationProvider = ({ children }) => {
   const [samplesPerClass, setSamplesPerClass] = useState(0);
   const [layers, setLayers] = useState([]);
   const [neuronsPerLayer, setNeuronsPerLayer] = useState(0);
+  const [batchSize, setBatchSize] = useState(10);
+  const [epoch, setEpoch] = useState(1);
+  const [trainProportion, setTrainProportion] = useState(0.75);
 
   return (
     <VisualizationContext.Provider
@@ -23,6 +26,12 @@ const VisualizationProvider = ({ children }) => {
         setLayers,
         neuronsPerLayer,
         setNeuronsPerLayer,
+        batchSize,
+        setBatchSize,
+        epoch,
+        setEpoch,
+        trainProportion,
+        setTrainProportion,
       }}
     >
       {children}
