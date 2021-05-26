@@ -13,9 +13,7 @@ const Home = () => {
   // TODO: Use provider values to manipulate visualizaiton
 
   return (
-    <Canvas>
-      <ambientLight />
-      <pointLight position={[10, 10, 10]} />
+    <Canvas camera={{ position: [0, 0, 50] }}>
       <NeuralNet layers={layers} classes={classes} />
     </Canvas>
   );
