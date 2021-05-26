@@ -1,6 +1,8 @@
 const datasets = {
-  A: 'Dataset A',
-  B: 'Dataset B',
+  blobs: 'blobs',
+  circles: 'circles',
+  ansio: 'ansio',
+  moons: 'moons',
 };
 
 export { datasets };

@@ -14,6 +14,7 @@
     "@react-three/fiber": "^6.2.2",
     "@styled-system/prop-types": "^5.1.5",
     "antd": "^4.7.3",
+    "axios": "^0.21.1",
     "chart.js": "^3.3.0",
     "less": "^3.12.2",
     "prop-types": "^15.7.2",

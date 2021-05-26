@@ -1,13 +1,20 @@
 import React from 'react';
-import { Form, Select, InputNumber, Divider, Button } from 'antd';
+import { Form, Select, InputNumber, Divider, Button, Spin } from 'antd';
 import Text from 'antd/es/typography/Text';
 
 import { datasets } from '@config/constants';
-import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import {
+  CheckCircleFilled,
+  LoadingOutlined,
+  MinusCircleOutlined,
+  PlusOutlined,
+  ReloadOutlined,
+} from '@ant-design/icons';
 import { useVisualization } from '@providers/visualization';
 import Box from '@components/box';
 import { Sider } from './elements';
 import Graph from '../../../components/graph';
+import { trainApi } from '../../../clients/axios';
 
 const { Item } = Form;
 const { Option } = Select;
@@ -33,7 +40,36 @@ const Sidebar = () => {
     setSelectedPoint,
     classification,
     setClassification,
+    fetchingDataset,
+    training,
+    setTraining,
+    trained,
+    setTrained,
+    weights,
+    setWeights,
+    accuracy,
+    setAccuracy,
+    loss,
+    setLoss,
   } = useVisualization();
+
+  const train = async () => {
+    setTraining(true);
+    try {
+      const { data } = await trainApi.get(
+        `/train?dataset_name=${dataset}&classes=${classes}&samples_per_class=${samplesPerClass}&train_proportion=${trainProportion}&hidden_layer_neurons=${layers}&batch_size=${batchSize}&epochs=${epoch}`
+      );
+      const { accuracy, loss, weights } = data;
+      setWeights(weights);
+      setAccuracy(accuracy);
+      setLoss(loss);
+      setTrained(true);
+      setTraining(false);
+    } catch (e) {
+      console.error(`Error while trying to get the dataset: ${e}`);
+      setTraining(false);
+    }
+  };
 
   return (
     <Sider width={300} theme="light" collapsed={false}>
@@ -47,7 +83,7 @@ const Sidebar = () => {
         }}
       >
         <Item label="Dataset" name="dataset">
-          <Select onChange={({ value }) => setDataset(value)} placeholder="Selecciona un dataset">
+          <Select onChange={setDataset} placeholder="Selecciona un dataset">
             {Object.keys(datasets).map((type) => (
               <Option key={type} value={type}>
                 {datasets[type]}
@@ -55,10 +91,11 @@ const Sidebar = () => {
             ))}
           </Select>
         </Item>
-        <Graph dataset={datasetData} />
+        <Graph fetchingDataset={fetchingDataset} dataset={datasetData} />
         <Item label="Clases" name="classes">
           <InputNumber
             min={0}
+            max={5}
             onChange={setClasses}
             style={{ width: '100%' }}
             placeholder="Número de clases"
@@ -66,9 +103,10 @@ const Sidebar = () => {
             parser={(value) => value.replace(' clases', '')}
           />
         </Item>
-        <Item label="Samples por clase" name="samplesPerClass">
+        <Item label="Elementos por clase" name="samplesPerClass">
           <InputNumber
             min={0}
+            max={300}
             onChange={setSamplesPerClass}
             style={{ width: '100%' }}
             placeholder="Samples por clase"
@@ -97,6 +135,7 @@ const Sidebar = () => {
               <InputNumber
                 value={value}
                 min={1}
+                max={50}
                 onChange={(val) =>
                   setLayers((prevLayers) => {
                     const newLayers = [...prevLayers];
@@ -145,7 +184,7 @@ const Sidebar = () => {
           <InputNumber min={0} onChange={setBatchSize} style={{ width: '100%' }} />
         </Item>
         <Item label="Epoch" name="epoch">
-          <InputNumber min={0} onChange={setEpoch} style={{ width: '100%' }} />
+          <InputNumber min={0} max={10} onChange={setEpoch} style={{ width: '100%' }} />
         </Item>
         <Item label="Proporción de entrenamiento" name="trainProportion">
           <InputNumber
@@ -159,12 +198,49 @@ const Sidebar = () => {
             style={{ width: '100%' }}
           />
         </Item>
+        <Button
+          type="primary"
+          disabled={!dataset}
+          onClick={train}
+          style={{ width: '100%', marginBottom: '10px' }}
+        >
+          {!trained && !training ? (
+            <Text style={{ color: !dataset ? 'lightgray' : 'white' }}>Entrenar</Text>
+          ) : training ? (
+            <Text style={{ color: 'white' }}>
+              Entrenando <LoadingOutlined color="white" />
+            </Text>
+          ) : (
+            <Text style={{ color: 'white' }}>
+              Volver a entrenar <ReloadOutlined color="white" />
+            </Text>
+          )}
+        </Button>
       </Form>
-      <Text strong>Selecciona el punto que te gustaría clasificar con tu modelo entrenado</Text>
+      <>
+        {!trained ? (
+          <div>
+            <Text strong>
+              Los resultados de tu entrenamiento saldrán acá en cuanto entrenes tu modelo
+            </Text>
+          </div>
+        ) : (
+          <div>
+            <Text strong>Resultados</Text>
+            <br />
+            <Text>Accuracy: {accuracy * 100}%</Text>
+            <br />
+            <Text>Loss: {loss * 100}%</Text>
+          </div>
+        )}
+      </>
       <Divider orientation="left">Prueba tu modelo</Divider>
+      <Text strong>Selecciona el punto que te gustaría clasificar con tu modelo entrenado</Text>
+      <br />
       <Graph
         dataset={datasetData}
         selectedPoint={selectedPoint}
+        fetchingDataset={fetchingDataset}
         onClick={(event) => {
           let valueX = null;
           let valueY = null;
@@ -181,14 +257,14 @@ const Sidebar = () => {
       />
       <Button
         type="primary"
+        disabled={!trained}
         onClick={() => {
           console.log('Mandar a backend para predecir...');
           setClassification(0);
         }}
-        style={{ width: '100%' }}
-        icon={<PlusOutlined />}
+        style={{ width: '100%', marginTop: '10px' }}
       >
-        Clasificar punto
+        <Text style={{ color: !trained ? 'lightgray' : 'white' }}>Clasificar punto</Text>
       </Button>
       <Divider orientation="left">Resultados</Divider>
       {classification !== null && <div>Mostrar acá la clasificación numérica + su color</div>}
