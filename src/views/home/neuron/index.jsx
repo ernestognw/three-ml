@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useFrame, extend, useThree } from '@react-three/fiber';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { Color, Line3, Vector3 } from 'three';
 
 extend({ OrbitControls });
 
@@ -32,10 +33,16 @@ extend({ OrbitControls });
 function Neuron(props) {
   const mesh = useRef();
 
+  const curEmmisiveIntensity = Math.random() * 10;
+
   return (
     <mesh {...props} ref={mesh} scale={1}>
       <sphereGeometry args={[1]} />
-      <meshStandardMaterial color="orange" />
+      <meshStandardMaterial
+        color="white"
+        emissive={new Color(0, 0, curEmmisiveIntensity / 10)}
+        emissiveIntensity={curEmmisiveIntensity}
+      />
     </mesh>
   );
 }
@@ -96,11 +103,13 @@ const CameraControls = () => {
     <orbitControls
       ref={controls}
       args={[camera, domElement]}
-      enableZoom={false}
+      enableZoom={true}
       // maxAzimuthAngle={Math.PI / 4}
       // maxPolarAngle={Math.PI}
       minAzimuthAngle={-Math.PI / 4}
       minPolarAngle={0}
+      minDistance={50}
+      maxDistance={100}
     />
   );
 };
@@ -165,6 +174,16 @@ function ComposedLayer({ z, neurons }) {
   return neuronsUI;
 }
 
+function Line({ start, end }) {
+  const vertices = [start, end].map((v) => new Vector3(...v));
+  return (
+    <line>
+      <geometry name="geometry" vertices={vertices} />
+      <lineBasicMaterial name="material" color="black" />
+    </line>
+  );
+}
+
 function NeuralNet({ layers: layersProp, classes }) {
   const layers = [2, ...layersProp, classes];
 
@@ -182,9 +201,8 @@ function NeuralNet({ layers: layersProp, classes }) {
   return (
     <>
       <CameraControls />
-      <ambientLight />
-      <pointLight position={[10, 10, 10]} />
       {layersUI}
+      {/* <Line start={[0, 0, 0]} end={[100, 100, 100]} /> */}
     </>
   );
 }

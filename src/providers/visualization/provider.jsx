@@ -26,7 +26,7 @@ const VisualizationProvider = ({ children }) => {
   });
   const [classes, setClasses] = useState(2);
   const [samplesPerClass, setSamplesPerClass] = useState(0);
-  const [layers, setLayers] = useState([]);
+  const [layers, setLayers] = useState([29, 16, 27]);
   const [neuronsPerLayer, setNeuronsPerLayer] = useState(0);
   const [batchSize, setBatchSize] = useState(10);
   const [epoch, setEpoch] = useState(1);
