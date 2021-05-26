@@ -1,11 +1,11 @@
 import React from 'react';
-import { Button } from 'antd';
 import MainLayout from '@layouts/main';
+import Home from '@views/home';
 
 const App = () => {
   return (
     <MainLayout>
-      <Button type="primary">Hola</Button>
+      <Home />
     </MainLayout>
   );
 };
