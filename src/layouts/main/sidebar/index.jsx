@@ -7,6 +7,7 @@ import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { useVisualization } from '@providers/visualization';
 import Box from '@components/box';
 import { Sider } from './elements';
+import Graph from '../../../components/graph';
 
 const { Item } = Form;
 const { Option } = Select;
@@ -15,6 +16,7 @@ const Sidebar = () => {
   const {
     dataset,
     setDataset,
+    datasetData,
     classes,
     setClasses,
     samplesPerClass,
@@ -27,6 +29,10 @@ const Sidebar = () => {
     setEpoch,
     trainProportion,
     setTrainProportion,
+    selectedPoint,
+    setSelectedPoint,
+    classification,
+    setClassification,
   } = useVisualization();
 
   return (
@@ -49,6 +55,7 @@ const Sidebar = () => {
             ))}
           </Select>
         </Item>
+        <Graph dataset={datasetData} />
         <Item label="Clases" name="classes">
           <InputNumber
             min={0}
@@ -153,7 +160,38 @@ const Sidebar = () => {
           />
         </Item>
       </Form>
+      <Text strong>Selecciona el punto que te gustaría clasificar con tu modelo entrenado</Text>
       <Divider orientation="left">Prueba tu modelo</Divider>
+      <Graph
+        dataset={datasetData}
+        selectedPoint={selectedPoint}
+        onClick={(event) => {
+          let valueX = null;
+          let valueY = null;
+          Object.keys(event.chart.scales).forEach((element) => {
+            const scale = event.chart.scales[element];
+            if (scale.isHorizontal()) {
+              valueX = scale.getValueForPixel(event.x);
+            } else {
+              valueY = scale.getValueForPixel(event.y);
+            }
+          });
+          setSelectedPoint({ x: valueX, y: valueY });
+        }}
+      />
+      <Button
+        type="primary"
+        onClick={() => {
+          console.log('Mandar a backend para predecir...');
+          setClassification(0);
+        }}
+        style={{ width: '100%' }}
+        icon={<PlusOutlined />}
+      >
+        Clasificar punto
+      </Button>
+      <Divider orientation="left">Resultados</Divider>
+      {classification !== null && <div>Mostrar acá la clasificación numérica + su color</div>}
     </Sider>
   );
 };
