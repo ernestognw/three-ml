@@ -1,7 +1,9 @@
 import React from 'react';
-import { Form, Select, InputNumber, Divider } from 'antd';
+import { Form, Select, InputNumber, Divider, Button } from 'antd';
 import { datasets } from '@config/constants';
+import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { useVisualization } from '@providers/visualization';
+import Box from '@components/box';
 import { Sider } from './elements';
 
 const { Item } = Form;
@@ -15,6 +17,8 @@ const Sidebar = () => {
     setClasses,
     samplesPerClass,
     setSamplesPerClass,
+    layers,
+    setLayers,
   } = useVisualization();
 
   return (
@@ -59,6 +63,54 @@ const Sidebar = () => {
         </Item>
       </Form>
       <Divider orientation="left">Entrena tu modelo</Divider>
+      <Form>
+        {layers.map((value, index) => (
+          <Item key={index} label={`Layer ${index + 1}`} name={`layer${index}`}>
+            <Box display="flex" alignItems="center">
+              <InputNumber
+                value={value}
+                min={1}
+                onChange={(val) =>
+                  setLayers((prevLayers) => {
+                    const newLayers = [...prevLayers];
+                    newLayers[index] = val;
+                    return newLayers;
+                  })
+                }
+                style={{ width: '100%' }}
+                placeholder="Tamaño"
+              />
+              {layers.length > 1 && (
+                <MinusCircleOutlined
+                  style={{ marginLeft: 5 }}
+                  onClick={() =>
+                    setLayers((prevLayers) => {
+                      const newLayers = [...prevLayers];
+                      newLayers.splice(index, 1);
+                      return newLayers;
+                    })
+                  }
+                />
+              )}
+            </Box>
+          </Item>
+        ))}
+        <Item>
+          <Button
+            type="dashed"
+            onClick={() =>
+              setLayers((prevLayers) => {
+                const newLayers = [...prevLayers, 1];
+                return newLayers;
+              })
+            }
+            style={{ width: '100%' }}
+            icon={<PlusOutlined />}
+          >
+            Add field
+          </Button>
+        </Item>
+      </Form>
       <Divider orientation="left">Prueba tu modelo</Divider>
     </Sider>
   );

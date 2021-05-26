@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "@ant-design/colors": "^6.0.0",
+    "@ant-design/icons": "^4.6.2",
     "@react-three/fiber": "^6.2.2",
+    "@styled-system/prop-types": "^5.1.5",
     "antd": "^4.7.3",
     "less": "^3.12.2",
     "prop-types": "^15.7.2",
@@ -20,6 +22,7 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1",
     "styled-components": "^5.2.0",
+    "styled-system": "^5.1.5",
     "three": "^0.128.0"
   },
   "devDependencies": {

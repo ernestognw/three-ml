@@ -4,9 +4,10 @@ import { Layout } from 'antd';
 const { Sider: DefaultSider } = Layout;
 
 const Sider = styled(DefaultSider)`
-  width: 20% !important;
-  max-width: 20% !important;
-  flex-basis: 20% !important;
+  overflow-y: scroll;
+  width: 25% !important;
+  max-width: 25% !important;
+  flex-basis: 25% !important;
   padding: 10px 20px;
 
   &::-webkit-scrollbar {
