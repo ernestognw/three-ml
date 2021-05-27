@@ -69,7 +69,7 @@ const Graph = ({ fetchingDataset, dataset, onClick = null, selectedPoint = null 
 };
 
 Graph.propTypes = {
-  dataset: PropTypes.any.isRequired,
+  dataset: PropTypes.any,
   fetchingDataset: PropTypes.bool.isRequired,
   selectedPoint: PropTypes.any,
   onClick: PropTypes.any,

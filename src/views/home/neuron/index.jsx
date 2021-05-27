@@ -2,7 +2,8 @@ import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useFrame, extend, useThree } from '@react-three/fiber';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { Color, Line3, Vector3 } from 'three';
+import { Color, Vector3 } from 'three';
+import Axon from '../axon';
 
 extend({ OrbitControls });
 
@@ -114,7 +115,7 @@ const CameraControls = () => {
   );
 };
 
-function ComposedLayer({ z, neurons }) {
+function computeLayerPositions(z, neurons) {
   const angle = 0;
 
   const neuronsArr = [];
@@ -168,20 +169,15 @@ function ComposedLayer({ z, neurons }) {
     return [...position, z];
   });
 
+  return positions;
+}
+
+function ComposedLayer({ z, neurons }) {
+  const positions = computeLayerPositions(z, neurons);
   const neuronsUI = positions.map((position, idx) => {
     return <Neuron position={position} key={idx} />;
   });
   return neuronsUI;
-}
-
-function Line({ start, end }) {
-  const vertices = [start, end].map((v) => new Vector3(...v));
-  return (
-    <line>
-      <geometry name="geometry" vertices={vertices} />
-      <lineBasicMaterial name="material" color="black" />
-    </line>
-  );
 }
 
 function NeuralNet({ layers: layersProp, classes }) {
@@ -194,15 +190,34 @@ function NeuralNet({ layers: layersProp, classes }) {
     return start + idx * 15.0;
   });
 
+  let neuronsPositions = [];
+
   const layersUI = layers.map((neurons, idx) => {
+    neuronsPositions.push(computeLayerPositions(zArr[idx], neurons));
     return <ComposedLayer z={zArr[idx]} neurons={neurons} key={idx} />;
   });
+
+  // COMPUTE THE AXONS
+  let axons = [];
+  for (let layerIdx = 0; layerIdx < neuronsPositions.length - 1; layerIdx++) {
+    for (let i = 0; i < neuronsPositions[layerIdx].length; i++) {
+      for (let j = 0; j < neuronsPositions[layerIdx + 1].length; j++) {
+        const start = neuronsPositions[layerIdx][i];
+        const end = neuronsPositions[layerIdx + 1][j];
+        const curAxon = <Axon start={start} end={end} />;
+
+        // Instead of this, we would check if weights[layerIdx][i][j] is amongst the highest
+        // 10% values from weights[layerIdx]
+        if (Math.random() < 0.1) axons.push(curAxon);
+      }
+    }
+  }
 
   return (
     <>
       <CameraControls />
       {layersUI}
-      {/* <Line start={[0, 0, 0]} end={[100, 100, 100]} /> */}
+      {axons}
     </>
   );
 }
