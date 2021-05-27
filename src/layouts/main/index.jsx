@@ -6,12 +6,12 @@ import Sidebar from './sidebar';
 
 const { Content } = Layout;
 
-const MainLayout = ({ children }) => {
+const MainLayout = ({ children, setNNWeights, setResults }) => {
   return (
     <Layout style={{ minHeight: '100vh', maxHeight: '100vh' }}>
       <Navbar />
       <Layout>
-        <Sidebar />
+        <Sidebar setNNWeights={setNNWeights} setResults={setResults} />
         <Content>{children}</Content>
       </Layout>
     </Layout>

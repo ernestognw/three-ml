@@ -19,7 +19,7 @@ import { trainApi } from '../../../clients/axios';
 const { Item } = Form;
 const { Option } = Select;
 
-const Sidebar = () => {
+const Sidebar = ({ setNNWeights, setResults }) => {
   const {
     dataset,
     setDataset,
@@ -61,6 +61,7 @@ const Sidebar = () => {
       );
       const { accuracy, loss, weights } = data;
       setWeights(weights);
+      setNNWeights(weights);
       setAccuracy(accuracy);
       setLoss(loss);
       setTrained(true);
@@ -69,6 +70,109 @@ const Sidebar = () => {
       console.error(`Error while trying to get the dataset: ${e}`);
       setTraining(false);
     }
+  };
+
+  const matMul = (A, B) => {
+    const n = A.length;
+    const k = B.length;
+    const m = B[0].length;
+    let ans = [];
+    for (let row = 0; row < n; row++) {
+      let curAns = [];
+      for (let col = 0; col < m; col++) {
+        let curAnsNum = 0;
+        for (let i = 0; i < k; i++) {
+          curAnsNum += A[row][i] * B[i][col];
+        }
+        curAns.push(curAnsNum);
+      }
+      ans.push(curAns);
+    }
+    return ans;
+  };
+
+  const matSum = (A, B) => {
+    let ans = [];
+    for (let i = 0; i < A.length; i++) {
+      let curAns = [];
+      for (let j = 0; j < A[0].length; j++) {
+        curAns.push(A[i][j] + B[i][j]);
+      }
+      ans.push(curAns);
+    }
+    return ans;
+  };
+
+  const relu = (A) => {
+    let ans = A.map((row) => {
+      return row.map((val) => {
+        return val < 0 ? 0 : val;
+      });
+    });
+    return ans;
+  };
+
+  const matExp = (A) => {
+    let ans = A.map((row) => {
+      return row.map((val) => {
+        return Math.exp(val);
+      });
+    });
+    return ans;
+  };
+
+  const matDiv = (A, d) => {
+    let ans = A.map((row) => {
+      return row.map((val) => {
+        return val / d;
+      });
+    });
+    return ans;
+  };
+
+  const matSumAll = (A) => {
+    let ans = 0;
+    for (let i = 0; i < A.length; i++) {
+      for (let j = 0; j < A[0].length; j++) {
+        ans += A[i][j];
+      }
+    }
+    return ans;
+  };
+
+  const softmax = (A) => {
+    return matDiv(matExp(A), matSumAll(matExp(A)));
+  };
+
+  const argMax = (A) => {
+    let ans = A.map((row) => {
+      let idx = 0;
+      let curMax = row[0];
+      for (let i = 1; i < row.length; i++) {
+        if (row[i] > curMax) {
+          idx = i;
+          curMax = row[i];
+        }
+      }
+      return idx;
+    });
+    return ans;
+  };
+
+  const handleInference = () => {
+    const results = [];
+    let curLayer = [[selectedPoint.x, selectedPoint.y]];
+    results.push(curLayer);
+
+    for (let idx = 0; idx < weights.length; idx++) {
+      let result = matMul(curLayer, weights[idx]['weight']);
+      result = matSum(result, [weights[idx]['bias']]);
+      result = idx !== weights.length - 1 ? relu(result) : softmax(result);
+      results.push(result);
+      curLayer = result;
+    }
+    setResults(results);
+    setClassification(argMax(curLayer)[0]);
   };
 
   return (
@@ -259,7 +363,7 @@ const Sidebar = () => {
         type="primary"
         disabled={!trained}
         onClick={() => {
-          console.log('Mandar a backend para predecir...');
+          handleInference();
           setClassification(0);
         }}
         style={{ width: '100%', marginTop: '10px' }}

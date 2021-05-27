@@ -8,8 +8,8 @@ const VisualizationProvider = ({ children }) => {
   const [datasetData, setDatasetData] = useState(null);
   const [classes, setClasses] = useState(2);
   const [samplesPerClass, setSamplesPerClass] = useState(100);
-  const [layers, setLayers] = useState([29, 16, 27]);
-  const [batchSize, setBatchSize] = useState(1);
+  const [layers, setLayers] = useState([5, 4, 3]);
+  const [batchSize, setBatchSize] = useState(4);
   const [epoch, setEpoch] = useState(1);
   const [trainProportion, setTrainProportion] = useState(0.75);
   const [selectedPoint, setSelectedPoint] = useState({ x: 0, y: 0 });

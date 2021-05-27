@@ -3,7 +3,7 @@ import { Canvas } from '@react-three/fiber';
 import { useVisualization } from '@providers/visualization';
 import NeuralNet from './neuron';
 
-const Home = () => {
+const Home = ({ NNWeights, results }) => {
   const {
     classes,
     layers,
@@ -14,7 +14,7 @@ const Home = () => {
 
   return (
     <Canvas camera={{ position: [0, 0, 50] }}>
-      <NeuralNet layers={layers} classes={classes} />
+      <NeuralNet layers={layers} classes={classes} NNWeights={NNWeights} results={results} />
     </Canvas>
   );
 };

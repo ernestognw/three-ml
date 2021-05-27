@@ -7,6 +7,8 @@ import Axon from '../axon';
 
 extend({ OrbitControls });
 
+const EPSILON = 10e-9;
+
 // function Box(props) {
 //   // This reference will give us direct access to the THREE.Mesh object
 //   const mesh = useRef();
@@ -34,15 +36,13 @@ extend({ OrbitControls });
 function Neuron(props) {
   const mesh = useRef();
 
-  const curEmmisiveIntensity = Math.random() * 10;
-
   return (
     <mesh {...props} ref={mesh} scale={1}>
       <sphereGeometry args={[1]} />
       <meshStandardMaterial
         color="white"
-        emissive={new Color(0, 0, curEmmisiveIntensity / 10)}
-        emissiveIntensity={curEmmisiveIntensity}
+        emissive={new Color(1, 1, 1)}
+        emissiveIntensity={props.intensity * 10}
       />
     </mesh>
   );
@@ -172,15 +172,54 @@ function computeLayerPositions(z, neurons) {
   return positions;
 }
 
-function ComposedLayer({ z, neurons }) {
+function computeIntensities(results) {
+  let res = results.map((row) => {
+    return Math.max(...row);
+  });
+  let maxVal = Math.max(...res);
+  let ans = [];
+  for (let i = 0; i < results.length; i++) {
+    let curAns = [];
+    for (let j = 0; j < results[0].length; j++) {
+      curAns.push(Math.abs(maxVal, 0) < EPSILON ? 1 : results[i][j] / maxVal);
+    }
+    ans.push(curAns);
+  }
+  return ans;
+}
+
+function ComposedLayer({ z, neurons, results }) {
+  const NON_INFERENCE_INTENSITY = 0;
   const positions = computeLayerPositions(z, neurons);
+  const intensities = results ? computeIntensities(results) : null;
   const neuronsUI = positions.map((position, idx) => {
-    return <Neuron position={position} key={idx} />;
+    return (
+      <Neuron
+        position={position}
+        key={idx}
+        intensity={intensities ? intensities[0][idx] : NON_INFERENCE_INTENSITY}
+      />
+    );
   });
   return neuronsUI;
 }
 
-function NeuralNet({ layers: layersProp, classes }) {
+function getAxonThreshold(W) {
+  const PROPORTION_SHOWN = 0.1;
+  const weights = [];
+  for (let i = 0; i < W.length; i++) {
+    for (let j = 0; j < W[0].length; j++) {
+      weights.push(W[i][j]);
+    }
+  }
+  weights.sort();
+
+  const thresholdIdx = Math.floor(weights.length * (1 - PROPORTION_SHOWN));
+  const ans = thresholdIdx < weights.length ? weights[thresholdIdx] : weights[weights.length - 1];
+  return ans - EPSILON;
+}
+
+function NeuralNet({ layers: layersProp, classes, NNWeights, results }) {
   const layers = [2, ...layersProp, classes];
 
   let start;
@@ -194,21 +233,31 @@ function NeuralNet({ layers: layersProp, classes }) {
 
   const layersUI = layers.map((neurons, idx) => {
     neuronsPositions.push(computeLayerPositions(zArr[idx], neurons));
-    return <ComposedLayer z={zArr[idx]} neurons={neurons} key={idx} />;
+    return (
+      <ComposedLayer
+        z={zArr[idx]}
+        neurons={neurons}
+        key={idx}
+        results={results ? results[idx] : null}
+      />
+    );
   });
 
   // COMPUTE THE AXONS
   let axons = [];
-  for (let layerIdx = 0; layerIdx < neuronsPositions.length - 1; layerIdx++) {
-    for (let i = 0; i < neuronsPositions[layerIdx].length; i++) {
-      for (let j = 0; j < neuronsPositions[layerIdx + 1].length; j++) {
-        const start = neuronsPositions[layerIdx][i];
-        const end = neuronsPositions[layerIdx + 1][j];
-        const curAxon = <Axon start={start} end={end} />;
-
-        // Instead of this, we would check if weights[layerIdx][i][j] is amongst the highest
-        // 10% values from weights[layerIdx]
-        if (Math.random() < 0.1) axons.push(curAxon);
+  if (NNWeights) {
+    for (let layerIdx = 0; layerIdx < neuronsPositions.length - 1; layerIdx++) {
+      const threshold = getAxonThreshold(NNWeights[layerIdx]['weight']);
+      for (let i = 0; i < neuronsPositions[layerIdx].length; i++) {
+        for (let j = 0; j < neuronsPositions[layerIdx + 1].length; j++) {
+          const start = neuronsPositions[layerIdx][i];
+          const end = neuronsPositions[layerIdx + 1][j];
+          const curWeight = NNWeights[layerIdx]['weight'][i][j];
+          if (curWeight >= threshold) {
+            const curAxon = <Axon start={start} end={end} />;
+            axons.push(curAxon);
+          }
+        }
       }
     }
   }
