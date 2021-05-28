@@ -8,6 +8,8 @@ const distinct = (value, index, self) => {
   return self.indexOf(value) === index;
 };
 
+export const colors = ['#EF476F', '#FFD166', '#06D6A0', '#118AB2', '#073B4C'];
+
 const Graph = ({ fetchingDataset, dataset, onClick = null, selectedPoint = null }) => {
   if (!dataset && !fetchingDataset) {
     return (
@@ -20,9 +22,6 @@ const Graph = ({ fetchingDataset, dataset, onClick = null, selectedPoint = null 
   }
   // eslint-disable-next-line camelcase
   const { X, y } = dataset;
-
-  // TODO: Add as many colors as there can be classes
-  const colors = ['#EF476F', '#FFD166', '#06D6A0', '#118AB2', '#073B4C'];
 
   const points = X.map((point) => ({
     x: point[0],

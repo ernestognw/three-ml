@@ -313,7 +313,7 @@ function NeuralNet({ layers: layersProp, classes, NNWeights, results, isTrained 
 
   // COMPUTE THE AXONS
   let axons = [];
-  if (NNWeights) {
+  if (NNWeights && isTrained) {
     for (let layerIdx = 0; layerIdx < neuronsPositions.length - 1; layerIdx++) {
       const threshold = getAxonThreshold(NNWeights[layerIdx]['weight']);
       for (let i = 0; i < neuronsPositions[layerIdx].length; i++) {

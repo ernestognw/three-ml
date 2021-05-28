@@ -7,11 +7,12 @@ const Home = ({ NNWeights, results }) => {
   const {
     classes,
     layers,
+    trained,
     // Extract more data from here
   } = useVisualization();
 
   // TODO: Use provider values to manipulate visualizaiton
-  const isTrained = !(NNWeights == null);
+  const isTrained = !(NNWeights == null) && trained;
 
   return (
     <>
