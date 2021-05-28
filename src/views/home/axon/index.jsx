@@ -3,8 +3,13 @@ import React, { Fragment, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 function Line({ start, end }) {
+  let adjustedStart = [...start];
+  let adjustedEnd = [...end];
+  adjustedStart[1] += 0.1;
+  adjustedStart[2] += 1.8;
+  adjustedEnd[2] -= 1.8;
   let geometry = new THREE.BufferGeometry();
-  const vertices = new Float32Array([...start, ...end]);
+  const vertices = new Float32Array([...adjustedStart, ...adjustedEnd]);
   geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
 
   const material = new THREE.MeshBasicMaterial({ color: 'black' });

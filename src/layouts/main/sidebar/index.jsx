@@ -172,7 +172,7 @@ const Sidebar = ({ setNNWeights, setResults }) => {
       curLayer = result;
     }
     setResults(results);
-    setClassification(argMax(curLayer)[0]);
+    setClassification(argMax(curLayer)[0] + 1);
   };
 
   return (
@@ -334,7 +334,7 @@ const Sidebar = ({ setNNWeights, setResults }) => {
             <br />
             <Text>Accuracy: {accuracy * 100}%</Text>
             <br />
-            <Text>Loss: {loss * 100}%</Text>
+            <Text>Loss: {loss}</Text>
           </div>
         )}
       </>
@@ -364,14 +364,31 @@ const Sidebar = ({ setNNWeights, setResults }) => {
         disabled={!trained}
         onClick={() => {
           handleInference();
-          setClassification(0);
         }}
         style={{ width: '100%', marginTop: '10px' }}
       >
         <Text style={{ color: !trained ? 'lightgray' : 'white' }}>Clasificar punto</Text>
       </Button>
       <Divider orientation="left">Resultados</Divider>
-      {classification !== null && <div>Mostrar acá la clasificación numérica + su color</div>}
+      <>
+        {!classification ? (
+          <div>
+            <Text strong>
+              Los resultados de la inferencia saldrán acá en cuanto entrenes tu modelo
+            </Text>
+          </div>
+        ) : (
+          <div>
+            <Text strong>Resultados</Text>
+            <br />
+            <Text>
+              Punto Clasificado: ({selectedPoint.x.toFixed(2)}, {selectedPoint.y.toFixed()})
+            </Text>
+            <br />
+            <Text>Clasificación: {classification}</Text>
+          </div>
+        )}
+      </>
     </Sider>
   );
 };
