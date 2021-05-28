@@ -34,6 +34,17 @@ const EPSILON = 10e-9;
 //   );
 // }
 
+function IONeuron(props) {
+  const mesh = useRef();
+
+  return (
+    <mesh {...props} ref={mesh} scale={1}>
+      <sphereGeometry args={[1]} />
+      <meshStandardMaterial color="white" emissive={new Color(1, 1, 1)} emissiveIntensity={10} />
+    </mesh>
+  );
+}
+
 function Neuron(props) {
   const mesh = useRef();
 
@@ -199,20 +210,24 @@ function computeIntensities(results) {
   return ans;
 }
 
-function ComposedLayer({ z, neurons, results, neuronGeom, isTrained }) {
+function ComposedLayer({ z, neurons, results, neuronGeom, isTrained, isIO }) {
   const NON_INFERENCE_INTENSITY = 0;
   const positions = computeLayerPositions(z, neurons);
   const intensities = results ? computeIntensities(results) : null;
   const neuronsUI = positions.map((position, idx) => {
-    return (
-      <Neuron
-        position={position}
-        key={idx}
-        intensity={intensities ? intensities[0][idx] : NON_INFERENCE_INTENSITY}
-        neuronGeom={neuronGeom}
-        isTrained={isTrained}
-      />
-    );
+    if (isIO) {
+      return (
+        <Neuron
+          position={position}
+          key={idx}
+          intensity={intensities ? intensities[0][idx] : NON_INFERENCE_INTENSITY}
+          neuronGeom={neuronGeom}
+          isTrained={isTrained}
+        />
+      );
+    } else {
+      return <IONeuron position={position} />;
+    }
   });
   return neuronsUI;
 }
@@ -291,6 +306,7 @@ function NeuralNet({ layers: layersProp, classes, NNWeights, results, isTrained 
         results={results ? results[idx] : null}
         neuronGeom={neuronGeom}
         isTrained={isTrained}
+        isIO={idx > 0 && idx < layers.length - 1}
       />
     );
   });
@@ -306,7 +322,7 @@ function NeuralNet({ layers: layersProp, classes, NNWeights, results, isTrained 
           const end = neuronsPositions[layerIdx + 1][j];
           const curWeight = NNWeights[layerIdx]['weight'][i][j];
           if (curWeight >= threshold) {
-            const curAxon = <Axon start={start} end={end} />;
+            const curAxon = <Axon start={start} end={end} key={start} />;
             axons.push(curAxon);
           }
         }

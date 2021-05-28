@@ -332,9 +332,9 @@ const Sidebar = ({ setNNWeights, setResults }) => {
           <div>
             <Text strong>Resultados</Text>
             <br />
-            <Text>Accuracy: {accuracy * 100}%</Text>
+            <Text>Precisión: {(accuracy * 100).toFixed(1)}%</Text>
             <br />
-            <Text>Loss: {loss}</Text>
+            <Text>Valor del Error: {loss}</Text>
           </div>
         )}
       </>
