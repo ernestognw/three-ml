@@ -40,7 +40,11 @@ function IONeuron(props) {
   return (
     <mesh {...props} ref={mesh} scale={1}>
       <sphereGeometry args={[1]} />
-      <meshStandardMaterial color="white" emissive={new Color(1, 1, 1)} emissiveIntensity={10} />
+      <meshStandardMaterial
+        color="white"
+        emissive={new Color(1, 1, 1)}
+        emissiveIntensity={props.intensity * 10}
+      />
     </mesh>
   );
 }
@@ -226,7 +230,12 @@ function ComposedLayer({ z, neurons, results, neuronGeom, isTrained, isIO }) {
         />
       );
     } else {
-      return <IONeuron position={position} />;
+      return (
+        <IONeuron
+          position={position}
+          intensity={intensities ? intensities[0][idx] : NON_INFERENCE_INTENSITY}
+        />
+      );
     }
   });
   return neuronsUI;
