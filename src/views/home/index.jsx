@@ -27,10 +27,7 @@ const Home = ({ NNWeights, results }) => {
 
   return (
     <>
-      <Canvas camera={{ position: [0, 0, 50] }}>
-        {neuralNet}
-        <ViewPort />
-      </Canvas>
+      <Canvas camera={{ position: [0, 0, 50] }}>{neuralNet}</Canvas>
     </>
   );
 };
