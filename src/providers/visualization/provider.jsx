@@ -29,6 +29,7 @@ const VisualizationProvider = ({ children }) => {
       );
       setDatasetData(data);
       setFetchingDataset(false);
+      setWeights(null);
     } catch (e) {
       console.error(`Error while trying to get the dataset: ${e}`);
       setFetchingDataset(false);
@@ -38,6 +39,7 @@ const VisualizationProvider = ({ children }) => {
   useEffect(() => {
     if (dataset) {
       fetchDataset();
+      setTrained(false);
     }
   }, [classes, dataset, samplesPerClass]);
 

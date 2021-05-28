@@ -15,6 +15,7 @@ import Box from '@components/box';
 import { Sider } from './elements';
 import Graph from '../../../components/graph';
 import { trainApi } from '../../../clients/axios';
+import { colors } from '../../../components/graph/index';
 
 const { Item } = Form;
 const { Option } = Select;
@@ -247,6 +248,7 @@ const Sidebar = ({ setNNWeights, setResults }) => {
                     return newLayers;
                   })
                 }
+                disabled={trained}
                 formatter={(val) => {
                   return `${val} neurona${val === '1' ? '' : 's'}`;
                 }}
@@ -279,6 +281,7 @@ const Sidebar = ({ setNNWeights, setResults }) => {
             }
             style={{ width: '100%' }}
             icon={<PlusOutlined />}
+            disabled={trained}
           >
             Agregar capa
           </Button>
@@ -385,7 +388,20 @@ const Sidebar = ({ setNNWeights, setResults }) => {
               Punto Clasificado: ({selectedPoint.x.toFixed(2)}, {selectedPoint.y.toFixed()})
             </Text>
             <br />
-            <Text>Clasificación: {classification}</Text>
+            <Text>
+              Clasificación:{' '}
+              <div
+                style={{
+                  backgroundColor: colors[classification - 1],
+                  width: '50px',
+                  height: '20px',
+                  color: 'black',
+                  fontWeight: 700,
+                }}
+              >
+                {classification}
+              </div>
+            </Text>
           </div>
         )}
       </>
