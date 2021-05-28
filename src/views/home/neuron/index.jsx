@@ -322,7 +322,7 @@ function NeuralNet({ layers: layersProp, classes, NNWeights, results, isTrained 
           const end = neuronsPositions[layerIdx + 1][j];
           const curWeight = NNWeights[layerIdx]['weight'][i][j];
           if (curWeight >= threshold) {
-            const curAxon = <Axon start={start} end={end} key={start} />;
+            const curAxon = <Axon start={start} end={end} />;
             axons.push(curAxon);
           }
         }

@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useVisualization } from '@providers/visualization';
 import NeuralNet from './neuron';
+import ViewPort from '../../layouts/main/viewport';
 
 const Home = ({ NNWeights, results }) => {
   const {
@@ -13,16 +14,21 @@ const Home = ({ NNWeights, results }) => {
   // TODO: Use provider values to manipulate visualizaiton
   const isTrained = !(NNWeights == null);
 
+  const neuralNet = (
+    <NeuralNet
+      layers={layers}
+      classes={classes}
+      NNWeights={NNWeights}
+      results={results}
+      isTrained={isTrained}
+    />
+  );
+
   return (
     <>
       <Canvas camera={{ position: [0, 0, 50] }}>
-        <NeuralNet
-          layers={layers}
-          classes={classes}
-          NNWeights={NNWeights}
-          results={results}
-          isTrained={isTrained}
-        />
+        {neuralNet}
+        <ViewPort />
       </Canvas>
     </>
   );

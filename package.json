@@ -11,6 +11,7 @@
   "dependencies": {
     "@ant-design/colors": "^6.0.0",
     "@ant-design/icons": "^4.6.2",
+    "@react-three/drei": "^5.2.1",
     "@react-three/fiber": "^6.2.2",
     "@styled-system/prop-types": "^5.1.5",
     "antd": "^4.7.3",
