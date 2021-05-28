@@ -1,9 +1,10 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useFrame, extend, useThree } from '@react-three/fiber';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { Color, Vector3 } from 'three';
+import { Color, SphereGeometry, Vector3, BufferGeometry } from 'three';
 import Axon from '../axon';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 extend({ OrbitControls });
 
@@ -36,9 +37,19 @@ const EPSILON = 10e-9;
 function Neuron(props) {
   const mesh = useRef();
 
+  useFrame((state, delta) => {
+    if (!props.isTrained) {
+      mesh.current.rotation.y = Math.PI / 2;
+      if (mesh.current.material.emissiveIntensity > 1) {
+        mesh.current.material.emissiveIntensity -= 1;
+      }
+      mesh.current.material.emissiveIntensity += 0.005;
+    }
+  });
+
   return (
-    <mesh {...props} ref={mesh} scale={1}>
-      <sphereGeometry args={[1]} />
+    <mesh {...props} ref={mesh} scale={0.75}>
+      <bufferGeometry attach="geometry" {...props.neuronGeom.clone()} />
       <meshStandardMaterial
         color="white"
         emissive={new Color(1, 1, 1)}
@@ -188,7 +199,7 @@ function computeIntensities(results) {
   return ans;
 }
 
-function ComposedLayer({ z, neurons, results }) {
+function ComposedLayer({ z, neurons, results, neuronGeom, isTrained }) {
   const NON_INFERENCE_INTENSITY = 0;
   const positions = computeLayerPositions(z, neurons);
   const intensities = results ? computeIntensities(results) : null;
@@ -198,6 +209,8 @@ function ComposedLayer({ z, neurons, results }) {
         position={position}
         key={idx}
         intensity={intensities ? intensities[0][idx] : NON_INFERENCE_INTENSITY}
+        neuronGeom={neuronGeom}
+        isTrained={isTrained}
       />
     );
   });
@@ -219,7 +232,44 @@ function getAxonThreshold(W) {
   return ans - EPSILON;
 }
 
-function NeuralNet({ layers: layersProp, classes, NNWeights, results }) {
+async function loadNeuronGeometry() {
+  const loader = new GLTFLoader();
+  return new Promise((resolve, reject) => {
+    loader.load(
+      '/Neuron.glb',
+      (gltf) => {
+        resolve(gltf.scene.children[2].geometry);
+      },
+      undefined,
+      reject
+    );
+  });
+}
+
+function NeuralNet({ layers: layersProp, classes, NNWeights, results, isTrained }) {
+  const [neuronGeom, setNeuronGeom] = useState(new BufferGeometry());
+
+  // load the neuron geometry
+  useEffect(() => {
+    loadNeuronGeometry()
+      .then((res) => {
+        setNeuronGeom(res);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+
+  // VIEWPORT ATTEMPT
+  // useFrame(({gl, scene, camera}) => {
+  //   gl.autoClear = true;
+  //   gl.setViewport(150, 150, window.innerWidth / 2, window.innerHeight / 2);
+  //   gl.setScissor(0, 0, window.innerWidth / 2, window.innerHeight / 2);
+  //   gl.render(scene, camera);
+  //   gl.autoClear = false;
+  //   gl.clearDepth();
+  // })
+
   const layers = [2, ...layersProp, classes];
 
   let start;
@@ -239,6 +289,8 @@ function NeuralNet({ layers: layersProp, classes, NNWeights, results }) {
         neurons={neurons}
         key={idx}
         results={results ? results[idx] : null}
+        neuronGeom={neuronGeom}
+        isTrained={isTrained}
       />
     );
   });

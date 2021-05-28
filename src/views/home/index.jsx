@@ -1,5 +1,5 @@
-import React from 'react';
-import { Canvas } from '@react-three/fiber';
+import React, { useRef } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { useVisualization } from '@providers/visualization';
 import NeuralNet from './neuron';
 
@@ -11,11 +11,20 @@ const Home = ({ NNWeights, results }) => {
   } = useVisualization();
 
   // TODO: Use provider values to manipulate visualizaiton
+  const isTrained = !(NNWeights == null);
 
   return (
-    <Canvas camera={{ position: [0, 0, 50] }}>
-      <NeuralNet layers={layers} classes={classes} NNWeights={NNWeights} results={results} />
-    </Canvas>
+    <>
+      <Canvas camera={{ position: [0, 0, 50] }}>
+        <NeuralNet
+          layers={layers}
+          classes={classes}
+          NNWeights={NNWeights}
+          results={results}
+          isTrained={isTrained}
+        />
+      </Canvas>
+    </>
   );
 };
 
